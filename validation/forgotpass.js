@@ -3,13 +3,15 @@ const isEmpty = require('./is-empty')
 
 module.exports = function validateForgotpassinput(data) {
 	let errors = {}
+
 	data.email = !isEmpty(data.email) ? data.email : ''
 
 	if (!Validator.isEmail(data.email)) {
-		errors.email = 'Email is invalid'
+		errors.forgot_password = 'Email is invalid'
 	}
+
 	if (Validator.isEmpty(data.email)) {
-		errors.email = 'Email field is required'
+		errors.forgot_password = 'Email field is required'
 	}
 
 	return {

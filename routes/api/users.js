@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router()
-const gravatar = require('gravatar')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const keys = require('../../config/keys')
@@ -8,10 +7,13 @@ const passport = require('passport')
 const nodemailer = require('nodemailer')
 const crypto = require('crypto')
 const async = require('async')
+require('dotenv').config()
+
 // Load Input Validation
 const validateRegisterInput = require('../../validation/register')
 const validateLoginInput = require('../../validation/login')
 const validateForgotpassInput = require('../../validation/forgotpass')
+const validateResetpassinput = require('../../validation/resetpass')
 // Load User model
 const User = require('../../models/User')
 
@@ -36,16 +38,10 @@ router.post('/register', (req, res) => {
 			errors.email = 'Email already exists'
 			return res.status(400).json(errors)
 		} else {
-			const avatar = gravatar.url(req.body.email, {
-				s: '200', // Size
-				r: 'pg', // Rating
-				d: 'mm' // Default
-			})
-
 			const newUser = new User({
 				name: req.body.name,
+				last_name: req.body.last_name,
 				email: req.body.email,
-				avatar,
 				password: req.body.password
 			})
 
@@ -56,10 +52,37 @@ router.post('/register', (req, res) => {
 					newUser.save().then((user) => res.json(user)).catch((err) => console.log(err))
 				})
 			})
+			nodemailer.createTestAccount((err, account) => {
+				var transporter = nodemailer.createTransport({
+					service: process.env.NODEMAILER_SERVICE,
+					port: process.env.NODEMAILER_PORT,
+					secure: false, // true for 465, false for other ports
+					auth: {
+						user: process.env.NODEMAILER_USER, // generated ethereal user
+						pass: process.env.NODEMAILER_PASS // generated ethereal password
+					}
+				})
+
+				let mailOptions = {
+					from: '"Souhail" <mr.souid@live.fr>', // sender address
+					to: req.body.email,
+					replyTo: req.body.email, // list of receivers
+					subject: 'Inscription à la Corpalif ✔', // Subject line
+					text: ` Dear 
+				${req.body.last_name}, You are receiving this because you  have registered in the corpalif corporation`
+				}
+				transporter.sendMail(mailOptions, (error, info) => {
+					if (error) {
+						return console.log(error)
+					}
+					console.log('Message sent: %s', info.messageId)
+					console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info))
+					res.render('contact', { msg: 'Your message has been sent' })
+				})
+			})
 		}
 	})
 })
-
 // @route   GET api/users/login
 // @desc    Login User / Returning JWT Token
 // @access  Public
@@ -86,7 +109,12 @@ router.post('/login', (req, res) => {
 		bcrypt.compare(password, user.password).then((isMatch) => {
 			if (isMatch) {
 				// User Matched
-				const payload = { id: user.id, name: user.name, avatar: user.avatar } // Create JWT Payload
+				const payload = {
+					id: user.id,
+					name: user.name,
+					last_name: user.last_name,
+					email: user.email
+				} // Create JWT Payload
 
 				// Sign Token
 				jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600 }, (err, token) => {
@@ -109,10 +137,10 @@ router.post('/login', (req, res) => {
 router.get('/current', passport.authenticate('jwt', { session: false }), (req, res) => {
 	res.json({
 		id: req.user.id,
-		name: req.user.name,
-		email: req.user.email
+		name: req.user.name
 	})
 })
+
 // @route Post api/users/api/form
 // @desc Return contact details to corpalif
 // @access Private
@@ -134,18 +162,18 @@ router.post('/api/form', (req, res) => {
 
 		`
 		let transporter = nodemailer.createTransport({
-			service: 'Hotmail',
-			port: 587,
+			service: process.env.NODEMAILER_SERVICE,
+			port: process.env.NODEMAILER_PORT,
 			secure: false, // true for 465, false for other ports
 			auth: {
-				user: 'mr.souid@live.fr', // generated ethereal user
-				pass: 'ad&gjk456' // generated ethereal password
+				user: process.env.NODEMAILER_USER, // generated ethereal user
+				pass: process.env.NODEMAILER_PASS // generated ethereal password
 			}
 		})
 		let mailOptions = {
-			from: '"Souhail" <mr.souid@live.fr>', // sender address
-			to: 'souhailsouid4@gmail.com',
-			replyTo: 'mr.souid@live.fr', // list of receivers
+			from: process.env.NODEMAILER_USER, // sender address
+			to: process.env.NODEMAILER_USER,
+			replyTo: process.env.NODEMAILER_USER, // list of receivers
 			subject: 'Contact request ✔', // Subject line
 			text: 'Hello world?', // plain text body
 			html: htmlEmail // html body
@@ -165,10 +193,10 @@ router.post('/api/form', (req, res) => {
 // @desc Return forgot password
 // @access Private
 // forgot password
-router.get('/forgot', function(req, res) {
+router.get('/forgot_password', function(req, res) {
 	res.render('forgot')
 })
-router.post('/forgot_password', (req, res) => {
+router.post('/forgot_password', function(req, res, next) {
 	async.waterfall([
 		function(done) {
 			crypto.randomBytes(20, function(err, buf) {
@@ -178,14 +206,16 @@ router.post('/forgot_password', (req, res) => {
 		},
 		function(token, done) {
 			const { errors, isValid } = validateForgotpassInput(req.body)
-			// Check Validation
 
+			// Check Validation
 			if (!isValid) {
+				// Return any errors with 400 status
+				console.log(errors)
 				return res.status(400).json(errors)
 			}
 			User.findOne({ email: req.body.email }, function(err, user) {
 				if (!user) {
-					errors.email = 'User not found'
+					errors.forgot_password = 'No account with that email address exists.'
 					return res.status(404).json(errors)
 				}
 
@@ -198,21 +228,20 @@ router.post('/forgot_password', (req, res) => {
 			})
 		},
 		function(token, user, done) {
-			var transporter = nodemailer.createTransport({
-				service: 'Hotmail',
-				port: 587,
+			var smtpTransport = nodemailer.createTransport({
+				service: process.env.NODEMAILER_SERVICE,
+				port: process.env.NODEMAILER_PORT,
 				secure: false, // true for 465, false for other ports
 				auth: {
-					user: 'mr.souid@live.fr', // generated ethereal user
-					pass: 'ad&gjk456' // generated ethereal password
+					user: process.env.NODEMAILER_USER, // generated ethereal user
+					pass: process.env.NODEMAILER_PASS // generated ethereal password
 				}
 			})
 
-			let mailOptions = {
-				from: '"Souhail" <mr.souid@live.fr>', // sender address
+			var mailOptions = {
 				to: user.email,
-				replyTo: 'mr.souid@live.fr', // list of receivers
-				subject: 'Contact request ✔', // Subject line
+				from: 'mr.souid@live.fr',
+				subject: 'Node.js Password Reset',
 				text:
 					'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
 					'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
@@ -223,14 +252,98 @@ router.post('/forgot_password', (req, res) => {
 					'\n\n' +
 					'If you did not request this, please ignore this email and your password will remain unchanged.\n'
 			}
-			transporter.sendMail(mailOptions, (error, info) => {
-				if (error) {
-					return console.log(error)
-				}
-				console.log('Message sent: %s', info.messageId)
-				console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info))
-				res.render('contact', { msg: 'Your message has been sent' })
+			smtpTransport.sendMail(mailOptions, function(err) {
+				console.log('mail sent')
+
+				console.log('success', 'An e-mail has been sent to ' + user.email + ' with further instructions.')
+				done(err, 'done')
 			})
+		},
+
+		function(err) {
+			return res.status(422).json({ message: err })
+		}
+	])
+})
+
+router.get('/reset/:token', function(req, res) {
+	User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(
+		err,
+		user
+	) {
+		if (!user) {
+			console.log('error', 'Password reset token is invalid or has expired.')
+			return res.redirect('/forgot')
+		}
+		res.status('reset', {
+			user: req.user
+		})
+	})
+})
+router.post('/reset/:token', (req, res) => {
+	async.waterfall([
+		function(done) {
+			User.findOne({
+				resetPasswordToken: req.params.token,
+				resetPasswordExpires: { $gt: Date.now() }
+			}).exec(
+				function(err, user) {
+					const { errors, isValid } = validateResetpassinput(req.body)
+
+					// Check Validation
+					if (!isValid) {
+						// Return any errors with 400 status
+						console.log(errors)
+						return res.status(400).json(errors)
+					}
+					if (user) {
+						if (req.body.password === req.body.password2) {
+							user.password = bcrypt.hashSync(req.body.password, 10)
+							user.resetPasswordToken = undefined
+							user.resetPasswordExpires = undefined
+
+							// user.save().then(console.log(user))
+							user.save(function(err) {
+								done(err, user)
+								console.log(user, err)
+							})
+						}
+
+						var smtpTransport = nodemailer.createTransport({
+							service: process.env.NODEMAILER_SERVICE,
+							port: process.env.NODEMAILER_PORT,
+							secure: false, // true for 465, false for other ports
+							auth: {
+								user: process.env.NODEMAILER_USER, // generated ethereal user
+								pass: process.env.NODEMAILER_PASS // generated ethereal password
+							}
+						})
+
+						var mailOptions = {
+							to: user.email,
+							from: 'mr.souid@live.fr',
+							subject: 'Confirmation changement du mot de passe',
+							text:
+								user.last_name +
+								',' +
+								'This is a confirmation that the password for your account ' +
+								user.email +
+								' has just been changed.\n'
+						}
+						smtpTransport.sendMail(mailOptions, function(err) {
+							console.log('mail sent')
+							console.log(
+								'success',
+								'An e-mail has been sent to ' + user.email + ' with further instructions.'
+							)
+							done(err, 'done')
+						})
+					}
+				},
+				function(err) {
+					return res.status(422).json({ message: err })
+				}
+			)
 		}
 	])
 })
