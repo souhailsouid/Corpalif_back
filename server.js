@@ -2,12 +2,12 @@ const express = require('express')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 const passport = require('passport')
-const env = require('dotenv').config()
+require('dotenv').config()
 const users = require('./routes/api/users')
 const profile = require('./routes/api/profile')
 const posts = require('./routes/api/posts')
 const app = express()
-
+var flash = require('express-flash')
 // Annuaire Routes
 // Paris
 const paris_usp = require('./routes/api/Annuaire/Paris/usp')
@@ -72,12 +72,13 @@ const hautsdeseine_lits = require('./routes/api/Annuaire/HautsDeSeine/lits')
 // RECOMMANDATIONS ET OUTILS
 const veillemedicale_recommandation = require('./routes/api/veillemedicale/recommandations&outils')
 const caroussel = require('./routes/api/HomePage/caroussel')
-
+const adherent = require('./routes/api/HomePage/adherent')
+const register_file = require('./routes/api/HomePage/Register_file')
 // Body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use('/api', express.static('uploads'))
-
+app.use(flash())
 // DB Config
 const db = require('./config/keys').mongoURI
 
@@ -180,8 +181,12 @@ app.use('/api/annuaire/hautsdeseine', hautsdeseine_lits)
 app.use('/api/recommandation', veillemedicale_recommandation)
 // Home Page
 // Caroussel
-
 app.use('/api/caroussel', caroussel)
+// ADHERENT
+app.use('/api/adherent', adherent)
+// Formulaire d'admission
+app.use('/api/register_file', register_file)
+
 const port = process.env.PORT || 5000
 
 app.listen(port, () => console.log(`Server running on port ${port}`))

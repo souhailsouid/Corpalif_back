@@ -7,6 +7,7 @@ const passport = require('passport')
 const nodemailer = require('nodemailer')
 const crypto = require('crypto')
 const async = require('async')
+var flash = require('express-flash')
 require('dotenv').config()
 
 // Load Input Validation
