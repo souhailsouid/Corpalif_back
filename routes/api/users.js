@@ -64,7 +64,7 @@ router.post('/register', (req, res) => {
 				})
 
 				let mailOptions = {
-					from: '"Souhail" <mr.souid@live.fr>', // sender address
+					from: process.env.NODEMAILER_USER, // sender address
 					to: req.body.email,
 					replyTo: req.body.email, // list of receivers
 					subject: 'Inscription à la Corpalif ✔', // Subject line
@@ -240,7 +240,7 @@ router.post('/forgot_password', function(req, res, next) {
 
 			var mailOptions = {
 				to: user.email,
-				from: 'mr.souid@live.fr',
+				from: process.env.NODEMAILER_USER,
 				subject: 'Node.js Password Reset',
 				text:
 					'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
@@ -321,7 +321,7 @@ router.post('/reset/:token', (req, res) => {
 
 						var mailOptions = {
 							to: user.email,
-							from: 'mr.souid@live.fr',
+							from: process.env.NODEMAILER_USER,
 							subject: 'Confirmation changement du mot de passe',
 							text:
 								user.last_name +
