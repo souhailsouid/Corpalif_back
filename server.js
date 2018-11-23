@@ -67,13 +67,23 @@ const hautsdeseine_association = require('./routes/api/Annuaire/HautsDeSeine/ass
 const hautsdeseine_team = require('./routes/api/Annuaire/HautsDeSeine/structure')
 const hautsdeseine_had = require('./routes/api/Annuaire/HautsDeSeine/had')
 const hautsdeseine_lits = require('./routes/api/Annuaire/HautsDeSeine/lits')
-// Reset password
+
 // VEILLE MEDICALE
-// RECOMMANDATIONS ET OUTILS
+
 const veillemedicale_recommandation = require('./routes/api/veillemedicale/recommandations&outils')
+const veillemedicale_rencontre = require('./routes/api/veillemedicale/rencontre')
+const veillemedicale_evenement = require('./routes/api/veillemedicale/evenement')
+const veillemedicale_actualite = require('./routes/api/veillemedicale/actualite')
 const caroussel = require('./routes/api/HomePage/caroussel')
 const adherent = require('./routes/api/HomePage/adherent')
 const register_file = require('./routes/api/HomePage/Register_file')
+// AGENDA
+const agenda = require('./routes/api/HomePage//agenda')
+// OFFRE DEMPLOI
+//NOTIFCATION
+const agenda1 = require('./routes/api/HomePage/agenda1')
+const agenda2 = require('./routes/api/HomePage/agenda2')
+const offre = require('./routes/api/HomePage/offre')
 // Body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
@@ -179,6 +189,12 @@ app.use('/api/annuaire/hautsdeseine', hautsdeseine_lits)
 // RECOMMANDATIONS ET OUTILS
 
 app.use('/api/recommandation', veillemedicale_recommandation)
+// Rencontres
+app.use('/api/rencontre', veillemedicale_rencontre)
+// Evenements
+app.use('/api/evenement', veillemedicale_evenement)
+// Actualites
+app.use('/api/actualite', veillemedicale_actualite)
 // Home Page
 // Caroussel
 app.use('/api/caroussel', caroussel)
@@ -186,6 +202,15 @@ app.use('/api/caroussel', caroussel)
 app.use('/api/adherent', adherent)
 // Formulaire d'admission
 app.use('/api/register_file', register_file)
+// Agenda
+app.use('/api/agenda', agenda)
+// Notifications
+//AGENDA 1 & 	2
+app.use('/api/agenda1', agenda1)
+app.use('/api/agenda2', agenda2)
+// Offre d'emploi
+
+app.use('/api/offre', offre)
 
 const port = process.env.PORT || 5000
 
