@@ -17,21 +17,21 @@ const Structure = require('../../../../models/Annuaire/HautsDeSeine/structure')
 // @access  Public
 router.get('/test', (req, res) => res.json({ msg: 'Annuaire Works' }))
 
-// @route   GET api/annuaire/hautsdeseine/structure
+// @route   GET api/annuaire/hautsdeseine/team
 // @desc    Get current Annuaire
 // @access  Public
-router.get('/hautsdeseine/structure', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.get('/hautsdeseine/team', (req, res) => {
 	Structure.find()
 		.then((structure) => {
 			res.json(structure)
 		})
 		.catch((err) => res.status(404).json(err))
 })
-// @route   GET api/annuaire/hautsdeseine/structure
+// @route   GET api/annuaire/hautsdeseine/team
 // @desc    Get current Annuaire
 // @access  Public
 
-router.post('/hautsdeseine/structure', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.post('/hautsdeseine/team', passport.authenticate('jwt', { session: false }), (req, res) => {
 	const { errors, isValid } = validateAnnuaireInput(req.body)
 
 	// Check Validation
@@ -50,19 +50,19 @@ router.post('/hautsdeseine/structure', passport.authenticate('jwt', { session: f
 
 	newPost.save().then((post) => res.json(post))
 })
-// @route   GET api/annuaire/hautsdeseine/structure/:id
-// @desc    Get hautsdeseine/structure by id
+// @route   GET api/annuaire/hautsdeseine/team/:id
+// @desc    Get hautsdeseine/team by id
 // @access  Public
-router.get('/hautsdeseine/structure/:id', (req, res) => {
+router.get('/hautsdeseine/team/:id', (req, res) => {
 	Structure.findById(req.params.id)
 		.then((structure) => res.json(structure))
 		.catch((err) => res.status(404).json({ nostructurefound: 'No structure found with that ID' }))
 })
 
-// @route   UPDATE api/annuaire/hautsdeseine/structure/:id
+// @route   UPDATE api/annuaire/hautsdeseine/team/:id
 // @desc    update post
 // @access  Private
-router.put('/hautsdeseine/structure/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.put('/hautsdeseine/team/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
 	const { errors, isValid } = validateAnnuaireInput(req.body)
 	// Check Validation
 	if (!isValid) {
@@ -75,10 +75,10 @@ router.put('/hautsdeseine/structure/:id', passport.authenticate('jwt', { session
 	})
 })
 
-// @route   DELETE api/annuaire/hautsdeseine/structure/:id
+// @route   DELETE api/annuaire/hautsdeseine/team/:id
 // @desc    Delete post
 // @access  Private
-router.delete('/hautsdeseine/structure/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.delete('/hautsdeseine/team/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
 	Structure.findOne({ user: req.user.id }).then((structure) => {
 		Structure.findById(req.params.id)
 			.then((structure) => {

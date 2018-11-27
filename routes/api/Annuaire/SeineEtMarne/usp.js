@@ -20,7 +20,7 @@ router.get('/test', (req, res) => res.json({ msg: 'Annuaire Works' }))
 // @route   GET api/annuaire/seineetmarne/usp
 // @desc    Get current Annuaire
 // @access  Public
-router.get('/seineetmarne/usp', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.get('/seineetmarne/usp', (req, res) => {
 	Usp.find()
 		.then((usp) => {
 			res.json(usp)

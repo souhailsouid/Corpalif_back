@@ -14,6 +14,10 @@ module.exports = function validateForgotpassinput(data) {
 		errors.forgot_password = 'Email field is required'
 	}
 
+	if (!errors) {
+		errors.forgot_password = 'An email has been sent with further instructions'
+	}
+
 	return {
 		errors,
 		isValid: isEmpty(errors)

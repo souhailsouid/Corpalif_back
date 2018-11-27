@@ -31,7 +31,7 @@ router.get('/essonne/had', passport.authenticate('jwt', { session: false }), (re
 // @desc    Get current Annuaire
 // @access  Public
 
-router.post('/essonne/had', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.post('/essonne/had', (req, res) => {
 	const { errors, isValid } = validateAnnuaireInput(req.body)
 
 	// Check Validation

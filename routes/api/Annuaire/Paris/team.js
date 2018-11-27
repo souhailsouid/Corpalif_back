@@ -20,18 +20,18 @@ router.get('/test', (req, res) => res.json({ msg: 'Annuaire Works' }))
 // @route   GET api/annuaire/paris/team
 // @desc    Get current Annuaire
 // @access  Public
-router.get('/paris/structure', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.get('/paris/team', (req, res) => {
 	Structure.find()
 		.then((structure) => {
 			res.json(structure)
 		})
 		.catch((err) => res.status(404).json(err))
 })
-// @route   GET api/annuaire/paris/structure
+// @route   GET api/annuaire/paris/team
 // @desc    Get current Annuaire
 // @access  Public
 
-router.post('/paris/structure', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.post('/paris/team', passport.authenticate('jwt', { session: false }), (req, res) => {
 	const { errors, isValid } = validateAnnuaireInput(req.body)
 
 	// Check Validation
@@ -50,19 +50,19 @@ router.post('/paris/structure', passport.authenticate('jwt', { session: false })
 
 	newPost.save().then((post) => res.json(post))
 })
-// @route   GET api/annuaire/paris/structure/:id
-// @desc    Get Paris/structure by id
+// @route   GET api/annuaire/paris/team/:id
+// @desc    Get Paris/team by id
 // @access  Public
-router.get('/paris/structure/:id', (req, res) => {
+router.get('/paris/team/:id', (req, res) => {
 	Structure.findById(req.params.id)
 		.then((structure) => res.json(structure))
 		.catch((err) => res.status(404).json({ nostructurefound: 'No structure found with that ID' }))
 })
 
-// @route   UPDATE api/annuaire/paris/structure/:id
+// @route   UPDATE api/annuaire/paris/team/:id
 // @desc    update post
 // @access  Private
-router.put('/paris/structure/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.put('/paris/team/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
 	const { errors, isValid } = validateAnnuaireInput(req.body)
 	// Check Validation
 	if (!isValid) {
@@ -75,10 +75,10 @@ router.put('/paris/structure/:id', passport.authenticate('jwt', { session: false
 	})
 })
 
-// @route   DELETE api/annuaire/paris/structure/:id
+// @route   DELETE api/annuaire/paris/team/:id
 // @desc    Delete post
 // @access  Private
-router.delete('/paris/structure/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.delete('/paris/team/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
 	Structure.findOne({ user: req.user.id }).then((structure) => {
 		Structure.findById(req.params.id)
 			.then((structure) => {

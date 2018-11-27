@@ -64,7 +64,7 @@ const essonne_lits = require('./routes/api/Annuaire/Essonne/lits')
 const hautsdeseine_usp = require('./routes/api/Annuaire/HautsDeSeine/usp')
 const hautsdeseine_reseaux = require('./routes/api/Annuaire/HautsDeSeine/reseaux')
 const hautsdeseine_association = require('./routes/api/Annuaire/HautsDeSeine/association')
-const hautsdeseine_team = require('./routes/api/Annuaire/HautsDeSeine/structure')
+const hautsdeseine_team = require('./routes/api/Annuaire/HautsDeSeine/team')
 const hautsdeseine_had = require('./routes/api/Annuaire/HautsDeSeine/had')
 const hautsdeseine_lits = require('./routes/api/Annuaire/HautsDeSeine/lits')
 

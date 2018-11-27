@@ -20,7 +20,7 @@ router.get('/test', (req, res) => res.json({ msg: 'Annuaire Works' }))
 // @route   GET api/annuaire/valdoise/association
 // @desc    Get current Annuaire
 // @access  Public
-router.get('/valdoise/association', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.get('/valdoise/association', (req, res) => {
 	Association.find()
 		.then((association) => {
 			res.json(association)
