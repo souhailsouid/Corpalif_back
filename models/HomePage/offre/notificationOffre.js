@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 // Create Schema
-const OffreSchema = new Schema({
+const NotificationoffreSchema = new Schema({
 	user: {
 		type: Schema.Types.ObjectId,
 		ref: 'users'
@@ -28,4 +28,4 @@ const OffreSchema = new Schema({
 		default: Date.now
 	}
 })
-module.exports = Offre = mongoose.model('Offre', OffreSchema)
+module.exports = NotificationOffre = mongoose.model('NotificationOffre', NotificationoffreSchema)

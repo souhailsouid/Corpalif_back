@@ -8,12 +8,16 @@ const YvelinessUspSchema = new Schema({
 		ref: 'users'
 	},
 	name: {
-		type: String,
-		required: true
+		type: String
 	},
-	adresse: {
-		type: String,
-		required: true
+	rue: {
+		type: String
+	},
+	postcode: {
+		type: String
+	},
+	compl: {
+		type: String
 	},
 	phone: {
 		type: String
@@ -21,7 +25,7 @@ const YvelinessUspSchema = new Schema({
 	email: {
 		type: String
 	},
-	responsable: {
+	web: {
 		type: String
 	},
 

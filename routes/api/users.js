@@ -8,6 +8,7 @@ const nodemailer = require('nodemailer')
 const crypto = require('crypto')
 const async = require('async')
 var flash = require('express-flash')
+var cors = require('cors')
 require('dotenv').config()
 
 // Load Input Validation
@@ -17,7 +18,14 @@ const validateForgotpassInput = require('../../validation/forgotpass')
 const validateResetpassinput = require('../../validation/resetpass')
 // Load User model
 const User = require('../../models/User')
+// paypal
+const paypal = require('paypal-rest-sdk')
 
+paypal.configure({
+	mode: 'sandbox', //sandbox or live
+	client_id: 'AS0sA4cFUPz6LLyuobu7_mu3DIEhxfqrhckbfCmz0tK3NlgHStufwkhRFi0zGNhZbgLged0THpdgP276',
+	client_secret: 'EO8sf9w95OkW_dr65BTWaI9_8iXrEL1229QpeaMkP6KeF6EBhs_DIR6M_KH1CzK-_4yGV5ZkM_lnPJSl'
+})
 // @route   GET api/users/test
 // @desc    Tests users route
 // @access  Public
@@ -64,13 +72,30 @@ router.post('/register', (req, res) => {
 					}
 				})
 
+				const htmlEmail = ` 
+				${req.body.last_name}, 
+				<p>
+					bienvenue sur le site Internet de la Corpalif !
+					<br/> 
+					Votre inscription a bien été prise en compte, vous pouvez à tout moment modifier vos informations dans votre profil.
+					<br/>
+					Si vous souhaitez recevoir régulièrement nos mails (rencontres, offres d'emploi, actualités), merci de cocher la case "Je souhaite recevoir les mails de la Corpalif".
+					<br/> 
+					Vous pouvez également nous suivre sur nos pages Facebook et Linkedin.
+          <br/>
+					Pour participer activement à l'activité de l'association, n'hésitez pas à consulter notre page d'adhésion. 
+          <br/>
+          <br/>
+					A très bientôt. 
+          <br/>
+					Corpalif
+					</p>`
 				let mailOptions = {
 					from: process.env.NODEMAILER_USER, // sender address
 					to: req.body.email,
 					replyTo: req.body.email, // list of receivers
 					subject: 'Inscription à la Corpalif ✔', // Subject line
-					text: ` Dear 
-				${req.body.last_name}, You are receiving this because you  have registered in the corpalif corporation`
+					html: htmlEmail
 				}
 				transporter.sendMail(mailOptions, (error, info) => {
 					if (error) {
@@ -309,8 +334,38 @@ router.post('/reset/:token', (req, res) => {
 								console.log(user, err)
 							})
 						}
+						const htmlEmail = `
+							<p>
+								Bonjour ${user.last_name}
+								<br />
+								vous avez demandé la modification de votre mot de passe pour ${user.email}.<br />
+								La modification a bien été prise en compte, vous pouvez dès maintenant vous connecter à
+								votre espace sur notre site www.corpalif.org.
+								<br />
+								<br />
+								A très bientôt
+							</p>`
 
 						var smtpTransport = nodemailer.createTransport({
+							// nodemailer.createTestAccount((err, account) => {
+
+							// let transporter = nodemailer.createTransport({
+							// 	service: process.env.NODEMAILER_SERVICE,
+							// 	port: process.env.NODEMAILER_PORT,
+							// 	secure: false, // true for 465, false for other ports
+							// 	auth: {
+							// 		user: process.env.NODEMAILER_USER, // generated ethereal user
+							// 		pass: process.env.NODEMAILER_PASS // generated ethereal password
+							// 	}
+							// })
+							// let mailOptions = {
+							// 	from: process.env.NODEMAILER_USER, // sender address
+							// 	to: process.env.NODEMAILER_USER,
+							// 	replyTo: process.env.NODEMAILER_USER, // list of receivers
+							// 	subject: 'Contact request ✔', // Subject line
+							// 	text: 'Hello world?', // plain text body
+							// 	html: htmlEmail // html body
+							// }
 							service: process.env.NODEMAILER_SERVICE,
 							port: process.env.NODEMAILER_PORT,
 							secure: false, // true for 465, false for other ports
@@ -324,12 +379,7 @@ router.post('/reset/:token', (req, res) => {
 							to: user.email,
 							from: process.env.NODEMAILER_USER,
 							subject: 'Confirmation changement du mot de passe',
-							text:
-								user.last_name +
-								',' +
-								'This is a confirmation that the password for your account ' +
-								user.email +
-								' has just been changed.\n'
+							html: htmlEmail
 						}
 						smtpTransport.sendMail(mailOptions, function(err) {
 							console.log('mail sent')

@@ -32,19 +32,13 @@ router.get('/seineetmarne/usp', (req, res) => {
 // @access  Public
 
 router.post('/seineetmarne/usp', passport.authenticate('jwt', { session: false }), (req, res) => {
-	const { errors, isValid } = validateAnnuaireInput(req.body)
-
-	// Check Validation
-	if (!isValid) {
-		// If any errors, send 400 with errors object
-		return res.status(400).json(errors)
-	}
-
 	const newPost = new Usp({
 		name: req.body.name,
-		adresse: req.body.adresse,
+		rue: req.body.rue,
+		postcode: req.body.postcode,
+		compl: req.body.compl,
 		phone: req.body.phone,
-		responsable: req.body.responsable,
+		web: req.body.web,
 		email: req.body.email
 	})
 

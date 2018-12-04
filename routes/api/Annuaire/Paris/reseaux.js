@@ -32,19 +32,13 @@ router.get('/paris/reseaux', (req, res) => {
 // @access  Public
 
 router.post('/paris/reseaux', passport.authenticate('jwt', { session: false }), (req, res) => {
-	const { errors, isValid } = validateAnnuaireInput(req.body)
-
-	// Check Validation
-	if (!isValid) {
-		// If any errors, send 400 with errors object
-		return res.status(400).json(errors)
-	}
-
 	const newPost = new Reseaux({
 		name: req.body.name,
-		adresse: req.body.adresse,
+		rue: req.body.rue,
+		postcode: req.body.postcode,
+		compl: req.body.compl,
 		phone: req.body.phone,
-		responsable: req.body.responsable,
+		web: req.body.web,
 		email: req.body.email
 	})
 
@@ -63,13 +57,6 @@ router.get('/paris/reseaux/:id', (req, res) => {
 // @desc    update post
 // @access  Private
 router.put('/paris/reseaux/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
-	const { errors, isValid } = validateAnnuaireInput(req.body)
-	// Check Validation
-	if (!isValid) {
-		// Return any errors with 400 status
-		return res.status(400).json(errors)
-	}
-
 	Reseaux.findByIdAndUpdate({ _id: req.params.id }, req.body).then((reseaux) => {
 		Reseaux.findOne({ _id: req.params.id }).then((reseaux) => res.send(reseaux))
 	})

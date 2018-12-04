@@ -18,7 +18,7 @@ const upload = multer({
 	storage: storage
 })
 
-router.post('/', upload.fields([]), (req, res, next) => {
+router.post('/notification/', upload.fields([]), (req, res, next) => {
 	console.log(req.files)
 	const post = new Offre({
 		_id: new mongoose.Types.ObjectId(),
@@ -50,7 +50,7 @@ router.post('/', upload.fields([]), (req, res, next) => {
 			})
 		})
 })
-router.get('/', (req, res) => {
+router.get('/notification', (req, res) => {
 	Offre.find()
 		.then((offre) => {
 			res.json(offre)
@@ -58,7 +58,7 @@ router.get('/', (req, res) => {
 		.catch((err) => res.status(404).json(err))
 })
 
-router.get('/:id', (req, res) => {
+router.get('/notification/:id', (req, res) => {
 	Offre.findById(req.params.id)
 		.select('file picture titre lieu company poste when')
 		.exec()
@@ -66,7 +66,7 @@ router.get('/:id', (req, res) => {
 		.catch((err) => res.status(404).json({ nooffrefound: 'No offre found with that ID' }))
 })
 
-router.patch('/:id', upload.fields([]), (req, res) => {
+router.patch('/notification/:id', upload.fields([]), (req, res) => {
 	const updateOps = {
 		when: req.body.when,
 		titre: req.body.titre,
@@ -82,7 +82,7 @@ router.patch('/:id', upload.fields([]), (req, res) => {
 	})
 })
 
-router.delete('/:id', (req, res, next) => {
+router.delete('/notification/:id', (req, res, next) => {
 	const id = req.params.id
 	Offre.remove({ _id: id })
 		.exec()

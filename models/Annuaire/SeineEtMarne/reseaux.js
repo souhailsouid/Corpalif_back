@@ -8,12 +8,16 @@ const SeineEtMarneReseauxSchema = new Schema({
 		ref: 'users'
 	},
 	name: {
-		type: String,
-		required: true
+		type: String
 	},
-	adresse: {
-		type: String,
-		required: true
+	rue: {
+		type: String
+	},
+	postcode: {
+		type: String
+	},
+	compl: {
+		type: String
 	},
 	phone: {
 		type: String
@@ -21,7 +25,7 @@ const SeineEtMarneReseauxSchema = new Schema({
 	email: {
 		type: String
 	},
-	responsable: {
+	web: {
 		type: String
 	},
 
@@ -30,5 +34,4 @@ const SeineEtMarneReseauxSchema = new Schema({
 		default: Date.now
 	}
 })
-
 module.exports = Reseaux_seineetmarne = mongoose.model('reseaux_seineetmarne', SeineEtMarneReseauxSchema)

@@ -8,12 +8,16 @@ const HautsDeSeineStructureSchema = new Schema({
 		ref: 'users'
 	},
 	name: {
-		type: String,
-		required: true
+		type: String
 	},
-	adresse: {
-		type: String,
-		required: true
+	rue: {
+		type: String
+	},
+	postcode: {
+		type: String
+	},
+	compl: {
+		type: String
 	},
 	phone: {
 		type: String
@@ -21,7 +25,7 @@ const HautsDeSeineStructureSchema = new Schema({
 	email: {
 		type: String
 	},
-	responsable: {
+	web: {
 		type: String
 	},
 
@@ -30,5 +34,4 @@ const HautsDeSeineStructureSchema = new Schema({
 		default: Date.now
 	}
 })
-
 module.exports = Structure_hautdeseine = mongoose.model('structure_hautdeseine', HautsDeSeineStructureSchema)
