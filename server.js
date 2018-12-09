@@ -5,6 +5,7 @@ const passport = require('passport')
 require('dotenv').config()
 const users = require('./routes/api/users')
 const profile = require('./routes/api/profile')
+const Profile_adherent = require('./routes/api/adherents')
 const posts = require('./routes/api/posts')
 const app = express()
 var cors = require('cors')
@@ -203,6 +204,7 @@ app.use(function(req, res, next) {
 // Use Routes
 app.use('/api/users', users)
 app.use('/api/profile', profile)
+app.use('/api/profileadherent', Profile_adherent)
 app.use('/api/posts', posts)
 app.use('/api/uploads', express.static('uploads'))
 
@@ -371,16 +373,18 @@ app.post('/api/charge', async (req, res) => {
 		res.status(500).end()
 	}
 })
-app.post('/api/charge', (req, res) => {
-	let { status } = stripe.charges.create({
-		amount: 1500,
-		currency: 'eur',
-		description: "Frais annuel d'adhesion",
-		source: req.body
-	})
+// app.post('/api/charge', (req, res) => {
+// 	let { status } = stripe.charges.create({
+// 		amount: 1500,
+// 		currency: 'eur',
+// 		description: "Frais annuel d'adhesion",
+// 		source: req.body
+// 	})
 
-	res.json({ status }).catch(res.status(500).end())
-})
+// 	res.json({ status }).catch(res.status(500).end())
+
+// })
+
 app.listen(80, function() {
 	console.log('CORS-enabled web server listening on port 80')
 })

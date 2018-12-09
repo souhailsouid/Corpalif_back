@@ -51,7 +51,10 @@ router.post('/register', (req, res) => {
 				name: req.body.name,
 				last_name: req.body.last_name,
 				email: req.body.email,
-				password: req.body.password
+				password: req.body.password,
+				status: req.body.status,
+
+				isAdmin: req.body.isAdmin
 			})
 
 			bcrypt.genSalt(10, (err, salt) => {
@@ -139,7 +142,10 @@ router.post('/login', (req, res) => {
 					id: user.id,
 					name: user.name,
 					last_name: user.last_name,
-					email: user.email
+					status: user.status,
+
+					email: user.email,
+					isAdmin: user.isAdmin
 				} // Create JWT Payload
 
 				// Sign Token

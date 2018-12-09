@@ -22,6 +22,32 @@ const ProfileSchema = new Schema({
 	company: {
 		type: String
 	},
+	// member: {
+	// 	type: String
+	// },
+
+	adherent: [
+		{
+			user: {
+				type: Schema.Types.ObjectId,
+				ref: 'users'
+			},
+			member: {
+				type: String
+			},
+
+			date: {
+				type: Date,
+				default: Date.now
+			}
+		}
+	],
+	newsletter: {
+		type: String,
+		required: true
+	},
+	checked: { type: String },
+
 	date: {
 		type: Date,
 		default: Date.now

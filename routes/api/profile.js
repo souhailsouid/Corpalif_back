@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
 const passport = require('passport')
-
+const nodemailer = require('nodemailer')
 // Load Validation
 const validateProfileInput = require('../../validation/profile')
 
@@ -51,6 +51,57 @@ router.get('/all', (req, res) => {
 			res.json(profiles)
 		})
 		.catch((err) => res.status(404).json({ profile: 'There are no profiles' }))
+})
+// @route   POST api/posts/comment/:id
+// @desc    Add comment to post
+// @access  Private
+router.post('/adherent', passport.authenticate('jwt', { session: false }), (req, res) => {
+	Profile.findOne({ user: req.user.id }).then((profile) => {
+		const newAdherent = {
+			member: req.body.member
+		}
+
+		// Add to comments array
+		profile.adherent.unshift(newAdherent)
+
+		// Save
+		profile.save().then((profile) => res.json(profile))
+		nodemailer.createTestAccount((err, account) => {
+			var transporter = nodemailer.createTransport({
+				service: process.env.NODEMAILER_SERVICE,
+				port: process.env.NODEMAILER_PORT,
+				secure: false, // true for 465, false for other ports
+				auth: {
+					user: process.env.NODEMAILER_USER, // generated ethereal user
+					pass: process.env.NODEMAILER_PASS // generated ethereal password
+				}
+			})
+			const htmlEmail = `
+      <p>
+        Bonjour ${req.user.last_name}
+        <br />
+      nous vous confirmons votre adhésion pour votre compte ${req.user.email}, pour l'année civile à la corpalif 
+        <br />
+        <br />
+        A très bientôt
+			</p>`
+			let mailOptions = {
+				from: process.env.NODEMAILER_USER, // sender address
+				to: req.user.email,
+				replyTo: req.body.email, // list of receivers
+				subject: 'Confirmation de votre adhésion à la corpalif ✔', // Subject line
+				html: htmlEmail
+			}
+			transporter.sendMail(mailOptions, (error, info) => {
+				if (error) {
+					return console.log(error)
+				}
+				console.log('Message sent: %s', info.messageId)
+				console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info))
+				res.render('contact', { msg: 'Your message has been sent' })
+			})
+		})
+	})
 })
 
 // @route   GET api/profile/handle/:handle
@@ -113,7 +164,8 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
 	if (req.body.company) profileFields.company = req.body.company
 	if (req.body.fonction) profileFields.fonction = req.body.fonction
 	if (req.body.location) profileFields.location = req.body.location
-
+	if (req.body.newsletter) profileFields.newsletter = req.body.newsletter
+	if (req.body.member) profileFields.member = req.body.member
 	Profile.findOne({ user: req.user.id }).then((profile) => {
 		if (profile) {
 			// Update
