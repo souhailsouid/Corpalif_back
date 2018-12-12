@@ -6,6 +6,7 @@ module.exports = function validateRegisterinput(data) {
 	;(data.name = !isEmpty(data.name) ? data.name : ''),
 		(data.last_name = !isEmpty(data.last_name) ? data.last_name : ''),
 		(data.email = !isEmpty(data.email) ? data.email : ''),
+		(data.status = !isEmpty(data.status) ? data.status : ''),
 		(data.password = !isEmpty(data.password) ? data.password : ''),
 		(data.password2 = !isEmpty(data.password2) ? data.password2 : '')
 
@@ -21,6 +22,9 @@ module.exports = function validateRegisterinput(data) {
 	}
 	if (Validator.isEmpty(data.last_name)) {
 		errors.registerLast_name = 'Last_name field is required'
+	}
+	if (Validator.isEmpty(data.status)) {
+		errors.registerStatus = 'Status is required'
 	}
 
 	if (Validator.isEmpty(data.email)) {

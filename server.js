@@ -373,18 +373,20 @@ app.post('/api/charge', async (req, res) => {
 		res.status(500).end()
 	}
 })
-// app.post('/api/charge', (req, res) => {
-// 	let { status } = stripe.charges.create({
-// 		amount: 1500,
-// 		currency: 'eur',
-// 		description: "Frais annuel d'adhesion",
-// 		source: req.body
-// 	})
+app.post('/api/charge50', async (req, res) => {
+	try {
+		let { status } = await stripe.charges.create({
+			amount: 5000,
+			currency: 'eur',
+			description: "Frais annuel d'adhesion",
+			source: req.body
+		})
 
-// 	res.json({ status }).catch(res.status(500).end())
-
-// })
-
+		res.json({ status })
+	} catch (err) {
+		res.status(500).end()
+	}
+})
 app.listen(80, function() {
 	console.log('CORS-enabled web server listening on port 80')
 })

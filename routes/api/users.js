@@ -16,6 +16,7 @@ const validateRegisterInput = require('../../validation/register')
 const validateLoginInput = require('../../validation/login')
 const validateForgotpassInput = require('../../validation/forgotpass')
 const validateResetpassinput = require('../../validation/resetpass')
+const validateHelperText = require('../../validation/helperText')
 // Load User model
 const User = require('../../models/User')
 // paypal
@@ -320,7 +321,8 @@ router.post('/reset/:token', (req, res) => {
 				resetPasswordExpires: { $gt: Date.now() }
 			}).exec(
 				function(err, user) {
-					const { errors, isValid } = validateResetpassinput(req.body)
+					const { errors, isValid, helperText } =
+						validateResetpassinput(req.body) || validateHelperText(req.body)
 
 					// Check Validation
 					if (!isValid) {
@@ -328,6 +330,8 @@ router.post('/reset/:token', (req, res) => {
 						console.log(errors)
 						return res.status(400).json(errors)
 					}
+					res.status(200).json(helperText)
+
 					if (user) {
 						if (req.body.password === req.body.password2) {
 							user.password = bcrypt.hashSync(req.body.password, 10)
@@ -335,11 +339,14 @@ router.post('/reset/:token', (req, res) => {
 							user.resetPasswordExpires = undefined
 
 							// user.save().then(console.log(user))
+
 							user.save(function(err) {
 								done(err, user)
+
 								console.log(user, err)
 							})
 						}
+
 						const htmlEmail = `
 							<p>
 								Bonjour ${user.last_name}
@@ -353,25 +360,6 @@ router.post('/reset/:token', (req, res) => {
 							</p>`
 
 						var smtpTransport = nodemailer.createTransport({
-							// nodemailer.createTestAccount((err, account) => {
-
-							// let transporter = nodemailer.createTransport({
-							// 	service: process.env.NODEMAILER_SERVICE,
-							// 	port: process.env.NODEMAILER_PORT,
-							// 	secure: false, // true for 465, false for other ports
-							// 	auth: {
-							// 		user: process.env.NODEMAILER_USER, // generated ethereal user
-							// 		pass: process.env.NODEMAILER_PASS // generated ethereal password
-							// 	}
-							// })
-							// let mailOptions = {
-							// 	from: process.env.NODEMAILER_USER, // sender address
-							// 	to: process.env.NODEMAILER_USER,
-							// 	replyTo: process.env.NODEMAILER_USER, // list of receivers
-							// 	subject: 'Contact request ✔', // Subject line
-							// 	text: 'Hello world?', // plain text body
-							// 	html: htmlEmail // html body
-							// }
 							service: process.env.NODEMAILER_SERVICE,
 							port: process.env.NODEMAILER_PORT,
 							secure: false, // true for 465, false for other ports

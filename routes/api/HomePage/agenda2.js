@@ -28,7 +28,7 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
 	Agenda2.findById(req.params.id)
-		.select('file picture theme lieu rue city when')
+		.select('file picture theme lieu rue city when, line')
 		.exec()
 		.then((agenda) => res.json(agenda))
 		.catch((err) => res.status(404).json({ noagendafound: 'No agenda found with that ID' }))
@@ -41,7 +41,8 @@ router.post('/notification/', upload.fields([]), (req, res, next) => {
 		theme: req.body.theme,
 		lieu: req.body.lieu,
 		rue: req.body.rue,
-		city: req.body.city
+		city: req.body.city,
+		line: req.body.line
 	})
 	post
 		.save()
@@ -71,7 +72,8 @@ router.patch('/:id', upload.fields([]), (req, res) => {
 		theme: req.body.theme,
 		lieu: req.body.lieu,
 		rue: req.body.rue,
-		city: req.body.city
+		city: req.body.city,
+		line: req.body.line
 	}
 	for (const [ key, value ] of Object.entries(updateOps)) {
 		console.log(key, value)

@@ -22,9 +22,9 @@ const ProfileSchema = new Schema({
 	company: {
 		type: String
 	},
-	// member: {
-	// 	type: String
-	// },
+	member: {
+		type: String
+	},
 
 	adherent: [
 		{

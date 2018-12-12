@@ -23,7 +23,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => 
 	const errors = {}
 
 	Profile.findOne({ user: req.user.id })
-		.populate('user', [ 'name' ])
+		.populate('user', [ 'name', 'last_name', 'email', 'status' ])
 		.then((profile) => {
 			if (!profile) {
 				errors.noprofile = 'There is no profile for this user'
@@ -41,7 +41,7 @@ router.get('/all', (req, res) => {
 	const errors = {}
 
 	Profile.find()
-		.populate('user', [ 'name' ])
+		.populate('user', [ 'name', 'last_name', 'email', 'status' ])
 		.then((profiles) => {
 			if (!profiles) {
 				errors.noprofile = 'There are no profiles'
@@ -80,7 +80,7 @@ router.post('/adherent', passport.authenticate('jwt', { session: false }), (req,
       <p>
         Bonjour ${req.user.last_name}
         <br />
-      nous vous confirmons votre adhésion pour votre compte ${req.user.email}, pour l'année civile à la corpalif 
+      nous vous confirmons vore adhésion pour votre compte ${req.user.email}, pour l'année civile à la corpalif 
         <br />
         <br />
         A très bientôt
@@ -103,27 +103,43 @@ router.post('/adherent', passport.authenticate('jwt', { session: false }), (req,
 		})
 	})
 })
+router.put('/adherent', passport.authenticate('jwt', { session: false }), (req, res) => {
+	Profile.findOneAndUpdate({ user: req.user.id }, req.body).then((profile) => {
+		profile.adherent.unshift().findOne()
+		Profile.findOne({ user: req.user.id }).then((profile) => res.send(profile))
 
-// @route   GET api/profile/handle/:handle
-// @desc    Get profile by handle
-// @access  Public
+		// router.put('/adherent', passport.authenticate('jwt', { session: false }), (req, res) => {
+		// 	Profile.findOneAndUpdate({ user: req.user.id }).then((profile) => {
+		// 		// Save
+		// 		Post.findById(req.params.id)
+		// 		profile.save().then((profile) => res.json(profile))
+		// 		router.put('/adherent', passport.authenticate('jwt', { session: false }), (req, res) => {
+		// 			Profile.findOneAndUpdate({ user: req.user.id }).then((profile) => {
+		// 				// profile.adherent.unshift(newAdherent)
+		// 				Profile.findOne({ user: req.user.id }).then((profile) => res.send(profile))
 
-router.get('/handle/:structure', (req, res) => {
-	const errors = {}
+		// })
+		// @route   GET api/profile/handle/:handle
+		// @desc    Get profile by handle
+		// @access  Public
 
-	Profile.findOne({ structure: req.params.structure })
-		.populate('user', [ 'name' ])
-		.then((profile) => {
-			if (!profile) {
-				errors.noprofile = 'There is no profile for this user'
-				res.status(404).json(errors)
-			}
+		router.get('/handle/:structure', (req, res) => {
+			const errors = {}
 
-			res.json(profile)
+			Profile.findOne({ structure: req.params.structure })
+				.populate('user', [ 'name' ])
+				.then((profile) => {
+					if (!profile) {
+						errors.noprofile = 'There is no profile for this user'
+						res.status(404).json(errors)
+					}
+
+					res.json(profile)
+				})
+				.catch((err) => res.status(404).json(err))
 		})
-		.catch((err) => res.status(404).json(err))
+	})
 })
-
 // @route   GET api/profile/user/:user_id
 // @desc    Get profile by user ID
 // @access  Public
@@ -185,6 +201,25 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
 				// Save Profile
 				new Profile(profileFields).save().then((profile) => res.json(profile))
 			})
+		}
+	})
+})
+
+router.post('/updatemember', passport.authenticate('jwt', { session: false }), (req, res) => {
+	// Get fields
+	const profileFields = {}
+	profileFields.user = req.user.id
+
+	if (req.body.member) profileFields.member = req.body.member
+	Profile.findOne({ user: req.user.id }).then((profile) => {
+		if (profile) {
+			// Update
+			Profile.findOneAndUpdate({ user: req.user.id }, { $set: profileFields }, { new: true }).then((profile) =>
+				res.json(profile)
+			)
+
+			// Save Profile
+			new Profile(profileFields).save().then((profile) => res.json(profile))
 		}
 	})
 })

@@ -11,6 +11,9 @@ const Agenda2Schema = mongoose.Schema({
 	lieu: {
 		type: String
 	},
+	line: {
+		type: String
+	},
 	rue: {
 		type: String
 	},
