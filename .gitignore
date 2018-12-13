@@ -3,3 +3,4 @@ package-lock.json
 .npm
 .DS_Store
 .env
+/config/keys_dev.js
